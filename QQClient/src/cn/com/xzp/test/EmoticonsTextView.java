@@ -1,0 +1,58 @@
+package cn.com.xzp.test;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ImageSpan;
+import android.util.AttributeSet;
+import android.widget.TextView;
+
+/**
+ * @author jelly
+ * @TIME 2018/1/11
+ * @DES 插入表情的TextView
+ */
+ 
+public class EmoticonsTextView extends TextView {
+ 
+    public EmoticonsTextView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
+ 
+    public EmoticonsTextView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+ 
+    @Override
+    public void setText(CharSequence text, BufferType type) {
+        if (!TextUtils.isEmpty(text)) {
+            super.setText(replace(text.toString()), type);
+        } else {
+            super.setText(text, type);
+        }
+    }
+ 
+    private CharSequence replace(String text) {
+        try {
+            SpannableString spannableString = new SpannableString(text);
+            //这里的正则表达式匹配格式是 [发呆]   []里面可以是任意字符 
+            Pattern pattern = Pattern.compile("\\[[a-zA-Z0-9\\u4e00-\\u9fa5]+\\]", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(text);
+            while (matcher.find()){
+            	//ee_1是图片资源名称
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier("ee_1", "drawable", getContext().getPackageName()));
+                ImageSpan imageSpan = new ImageSpan(getContext(), bitmap);
+                spannableString.setSpan(imageSpan,matcher.start(),matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            return spannableString;
+        } catch (Exception e) {
+            return text;
+        }
+    }
+}
